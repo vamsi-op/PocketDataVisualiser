@@ -238,12 +238,12 @@ export default function App() {
       <footer className="app-footer">
         <p>
           Made with ❤️ by{' '}
-          <a href="https://github.com/VamsiKrishna" target="_blank" rel="noopener noreferrer">
-            VamsiKrishna
+          <a href="https://github.com/vamsi-op" target="_blank" rel="noopener noreferrer">
+            vamsi-op
           </a>{' '}
           · Open Source ·{' '}
           <a
-            href="https://github.com/VamsiKrishna/data-visualizer"
+            href="https://github.com/vamsi-op/PocketDataVisualiser"
             target="_blank"
             rel="noopener noreferrer"
           >

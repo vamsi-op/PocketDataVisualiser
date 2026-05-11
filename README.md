@@ -6,7 +6,7 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Made with React](https://img.shields.io/badge/Made%20with-React-61dafb?logo=react)](https://react.dev)
 [![Powered by Chart.js](https://img.shields.io/badge/Powered%20by-Chart.js-ff6384?logo=chartdotjs)](https://www.chartjs.org/)
-[![Deploy on Vercel](https://img.shields.io/badge/Deploy%20on-Vercel-000?logo=vercel)](https://vercel.com/new)
+[![Deploy on Vercel](https://img.shields.io/badge/Deploy%20on-Vercel-000?logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/vamsi-op/PocketDataVisualiser)
 
 ---
 
@@ -30,7 +30,7 @@
 
 > **[data-visualizer.vercel.app](https://data-visualizer.vercel.app)** ← Deploy your own fork with one click
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/VamsiKrishna/data-visualizer)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vamsi-op/PocketDataVisualiser)
 
 ---
 
@@ -50,11 +50,17 @@
 
 ## 📸 Screenshots
 
-> *(Add screenshots to `docs/screenshots/` and uncomment below)*
+**Upload screen** — drag-and-drop with privacy badges and animated logo
 
-<!-- ![Upload screen](docs/screenshots/upload.png) -->
-<!-- ![Chart suggestions](docs/screenshots/charts.png) -->
-<!-- ![Customization panel](docs/screenshots/customize.png) -->
+![Upload screen](docs/screenshots/upload.png)
+
+**Data Preview** — paginated table with column-type badges (`Abc` / `123`)
+
+![Data preview with type badges](docs/screenshots/data-preview.png)
+
+**Chart Suggestions** — tab-switching between chart types with Customize panel
+
+![Chart suggestions and customization panel](docs/screenshots/charts.png)
 
 ---
 
@@ -181,7 +187,7 @@ Quick steps:
 3. Make your changes and write tests if applicable
 4. Open a Pull Request against `main`
 
-See the [open issues](../../issues) for ideas on where to start.
+See the [open issues](https://github.com/vamsi-op/PocketDataVisualiser/issues) for ideas on where to start.
 
 ---
 
@@ -231,6 +237,6 @@ This project is licensed under the **MIT License** — see [LICENSE](LICENSE) fo
 ---
 
 <div align="center">
-  Made with ❤️ by <a href="https://github.com/VamsiKrishna"><strong>VamsiKrishna</strong></a><br/>
-  If this project helped you, please ⭐ star the repo!
+  Made with ❤️ by <a href="https://github.com/vamsi-op"><strong>vamsi-op</strong></a><br/>
+  If this project helped you, please ⭐ <a href="https://github.com/vamsi-op/PocketDataVisualiser">star the repo</a>!
 </div>
