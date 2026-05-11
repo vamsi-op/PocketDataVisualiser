@@ -28,7 +28,7 @@
 
 ## 🌐 Live Demo
 
-> **[data-visualizer.vercel.app](https://data-visualizer.vercel.app)** ← Deploy your own fork with one click
+> **[data-visualizer-blush.vercel.app](https://data-visualizer-blush.vercel.app)** ← Live demo
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vamsi-op/PocketDataVisualiser)
 
