@@ -6,7 +6,6 @@
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
 [![Made with React](https://img.shields.io/badge/Made%20with-React-61dafb?logo=react)](https://react.dev)
 [![Powered by Chart.js](https://img.shields.io/badge/Powered%20by-Chart.js-ff6384?logo=chartdotjs)](https://www.chartjs.org/)
-[![Deploy on Vercel](https://img.shields.io/badge/Deploy%20on-Vercel-000?logo=vercel)](https://vercel.com/new/clone?repository-url=https://github.com/vamsi-op/PocketDataVisualiser)
 
 ---
 
@@ -29,8 +28,6 @@
 ## 🌐 Live Demo
 
 > **[data-visualizer-blush.vercel.app](https://data-visualizer-blush.vercel.app)** ← Live demo
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/vamsi-op/PocketDataVisualiser)
 
 ---
 
@@ -101,22 +98,6 @@ npm run dev
 ```
 
 Open **http://localhost:5173** in your browser.
-
-### Build for Production
-
-```bash
-npm run build    # Output in /dist
-npm run preview  # Preview the production build locally
-```
-
-### Deploy to Vercel
-
-```bash
-npm install -g vercel
-vercel --prod
-```
-
-Or click the **Deploy on Vercel** button at the top of this README.
 
 ---
 
