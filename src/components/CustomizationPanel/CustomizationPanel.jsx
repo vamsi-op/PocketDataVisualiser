@@ -23,10 +23,12 @@ export default function CustomizationPanel({
   headers,
   types,
   customization,
+  yKeys = [],          // lifted state from App — own prop
+  onYKeysChange,       // (newKeys: string[]) => void
   onChange,
   onAxisChange,
 }) {
-  const { color, xLabel, yLabel, showGrid, showLegend, yKeys = [] } = customization;
+  const { color, xLabel, yLabel, showGrid, showLegend } = customization;
   const isPolar     = suggestion.id === 'pie' || suggestion.id === 'doughnut';
   const isMultiAble = suggestion.id === 'bar' || suggestion.id === 'line';
 
@@ -39,9 +41,8 @@ export default function CustomizationPanel({
       : [...yKeys, key];
     // Always keep at least one selected
     if (next.length === 0) return;
-    // Only update yKeys — do NOT call onAxisChange here, as it would
-    // reset yKeys to a single-item array inside handleAxisChange.
-    onChange({ yKeys: next, yLabel: next[0] });
+    // Call the dedicated setter — completely independent of customization state
+    onYKeysChange(next);
   }
 
   return (

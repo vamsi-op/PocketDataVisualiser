@@ -45,7 +45,7 @@ const DEFAULT_CUSTOMIZATION = {
   yLabel:     '',
   showGrid:   true,
   showLegend: true,
-  yKeys:      [],   // multi-series Y columns
+  // NOTE: yKeys lives in its own useState below — NOT here
 };
 
 export default function App() {
@@ -56,6 +56,7 @@ export default function App() {
   const [suggestions,     setSuggestions]      = useState([]);
   const [activeIdx,       setActiveIdx]        = useState(0);
   const [customization,   setCustomization]    = useState(DEFAULT_CUSTOMIZATION);
+  const [yKeys,           setYKeys]            = useState([]);   // multi-series Y columns — independent state
   const [activeSuggestion,setActiveSuggestion] = useState(null);
   const [loading,         setLoading]          = useState(false);
   const [fileName,        setFileName]         = useState('');
@@ -99,8 +100,8 @@ export default function App() {
       ...DEFAULT_CUSTOMIZATION,
       xLabel: firstSug?.xKey ?? '',
       yLabel: firstSug?.yKey ?? '',
-      yKeys:  firstSug?.yKey ? [firstSug.yKey] : [],
     });
+    setYKeys(firstSug?.yKey ? [firstSug.yKey] : []);
   }
 
   // ── File upload ─────────────────────────────────────────────────────────────
@@ -131,8 +132,8 @@ export default function App() {
       ...prev,
       xLabel: sug.xKey ?? '',
       yLabel: sug.yKey  ?? '',
-      yKeys:  sug.yKey ? [sug.yKey] : [],
     }));
+    setYKeys(sug.yKey ? [sug.yKey] : []);
   }
 
   // ── Axis column override ─────────────────────────────────────────────────────
@@ -142,8 +143,9 @@ export default function App() {
       ...prev,
       xLabel: xKey,
       yLabel: yKey ?? '',
-      yKeys:  yKey ? [yKey] : prev.yKeys,
     }));
+    // Only reset yKeys when changing Y-axis dropdown (single column selected)
+    if (yKey) setYKeys([yKey]);
   }
 
   // ── Column reorder (drag) ────────────────────────────────────────────────────
@@ -359,7 +361,7 @@ export default function App() {
                         rows={parsed.rows}
                         headers={parsed.headers}
                         types={parsed.types}
-                        customization={customization}
+                        customization={{ ...customization, yKeys }}
                       />
                     )}
                     {activeSuggestion && renderer === 'echarts' && (
@@ -368,7 +370,7 @@ export default function App() {
                         rows={parsed.rows}
                         headers={parsed.headers}
                         types={parsed.types}
-                        customization={customization}
+                        customization={{ ...customization, yKeys }}
                       />
                     )}
                   </div>
@@ -378,6 +380,8 @@ export default function App() {
                     headers={parsed.headers}
                     types={parsed.types}
                     customization={customization}
+                    yKeys={yKeys}
+                    onYKeysChange={setYKeys}
                     onChange={(updates) => setCustomization((prev) => ({ ...prev, ...updates }))}
                     onAxisChange={handleAxisChange}
                   />
