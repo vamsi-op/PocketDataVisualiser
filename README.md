@@ -38,7 +38,12 @@
 | 📂 **Smart CSV/TSV Parser** | Auto-detects delimiter · Infers column types: `numeric`, `date`, `text`, `boolean` · Handles edge cases (BOM, quoted commas, empty cells) |
 | 🧠 **Intelligent Chart Suggestions** | Ranks up to 5 chart types based on your data's shape · Explains why each chart fits |
 | 📈 **Interactive Charts** | Bar · Line · Scatter · Pie · Doughnut · Histogram — all with hover tooltips |
-| 🎨 **Live Customization** | Color picker + 8 presets · Edit axis labels · Toggle grid lines & legend · Switch axis columns |
+| ⚡ **Dual Renderer** | Switch between **Chart.js** and **Apache ECharts** — ECharts is GPU-accelerated and handles 500+ row datasets with built-in zoom/pan |
+| 🎨 **Live Customization** | Color picker + 8 presets · Edit axis labels · Toggle grid lines & legend · Switch axis columns · Multi-series Y overlays |
+| 💡 **Data Insights** | One-line heuristic observations: peak values, trend direction, correlations, distribution skew |
+| 🔗 **Shareable Links** | Encodes CSV + chart state into URL hash — share charts with no backend |
+| ↔️ **Drag-to-reorder** | Drag column headers in the data table to reorder them |
+| ☀️🌙 **Theme Toggle** | Dark and light mode — respects OS preference, persisted in localStorage |
 | 📤 **Export** | Download charts as **PNG** · Export your (cleaned) data as **CSV** |
 | 🔒 **100% Private** | No server, no login, no cookies — everything runs in your browser |
 | ♿ **Accessible** | Full keyboard navigation · ARIA roles · Screen-reader-friendly |
@@ -65,14 +70,16 @@
 
 | Layer | Technology |
 |-------|-----------|
-| UI Framework | [React 18](https://react.dev) (via [Vite](https://vitejs.dev)) |
-| Charting | [Chart.js 4](https://www.chartjs.org) + [react-chartjs-2](https://react-chartjs-2.js.org) |
+| UI Framework | [React 19](https://react.dev) (via [Vite](https://vitejs.dev)) |
+| Charting (default) | [Chart.js 4](https://www.chartjs.org) + [react-chartjs-2](https://react-chartjs-2.js.org) |
+| Charting (alt) | [Apache ECharts 5](https://echarts.apache.org) — GPU-accelerated, code-split lazy chunk |
 | CSV Parsing | [PapaParse](https://www.papaparse.com) |
+| Offline / PWA | [vite-plugin-pwa](https://vite-pwa-org.netlify.app) + Workbox |
+| Testing | [Vitest](https://vitest.dev) (23 tests) |
 | Language | JavaScript (ES2022) |
 | Styling | Vanilla CSS (custom design system) |
 | Fonts | [Inter](https://fonts.google.com/specimen/Inter) + [JetBrains Mono](https://fonts.google.com/specimen/JetBrains+Mono) |
 | Linting | ESLint |
-| CI/CD | GitHub Actions (planned) |
 
 ---
 
@@ -199,13 +206,13 @@ Better libra
 
 ## 💬 Suggestions & Alternatives
 
-### Better libraries to consider for future growth
+### Library comparison
 
-| Library | Why |
-|---------|-----|
-| [Observable Plot](https://observablehq.com/plot/) | Concise grammar-of-graphics API built on D3 — less boilerplate than raw Chart.js |
-| [Apache ECharts](https://echarts.apache.org/) | 20+ chart types, GPU-accelerated, massive datasets |
-| [Vega-Lite](https://vega.github.io/vega-lite/) | Declarative JSON specs, automatic chart recommendations built-in |
+| Library | Status | Why |
+|---------|--------|-----|
+| [Apache ECharts](https://echarts.apache.org/) | ✅ **Implemented** | GPU-accelerated, 20+ chart types, built-in zoom/pan, code-split lazy chunk |
+| [Observable Plot](https://observablehq.com/plot/) | 🔲 Future | Concise grammar-of-graphics API built on D3 — ideal for exploratory analysis |
+| [Vega-Lite](https://vega.github.io/vega-lite/) | 🔲 Future | Declarative JSON specs, automatic chart recommendations built-in |
 
 ### Architectural ideas
 
