@@ -69,12 +69,13 @@
   background-clip: text;
 }
 
-/* Light mode: dark navy → indigo so title is always visible */
+/* Light mode: solid deep-indigo — always readable, no wash-out */
 [data-theme='light'] .logo-text {
-  background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #6366f1 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  background: none;
+  -webkit-background-clip: initial;
+  background-clip: initial;
+  -webkit-text-fill-color: #3730a3;
+  color: #3730a3;
 }
 
 .tagline {
