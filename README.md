@@ -183,14 +183,19 @@ See the [open issues](https://github.com/vamsi-op/PocketDataVisualiser/issues) f
 - [x] Sample datasets
 - [x] Full responsive layout
 - [x] Accessibility (ARIA, keyboard nav)
-- [ ] Unit tests (Vitest)
-- [ ] PWA support (offline-capable)
-- [ ] Dark / Light mode toggle
-- [ ] Shareable chart URLs (encode data in URL hash)
-- [ ] Drag-to-reorder columns
-- [ ] Multi-series charts (plot multiple Y columns)
+- [x] **Unit tests — Vitest** (23 tests across `csvParser` + `chartSuggest`) ✨ v1.1
+- [x] **PWA support** — offline-capable via `vite-plugin-pwa` + Workbox ✨ v1.1
+- [x] **Dark / Light mode toggle** — OS preference detection + localStorage ✨ v1.1
+- [x] **Shareable chart URLs** — base64 URL-hash encoding of CSV + chart state ✨ v1.1
+- [x] **Drag-to-reorder columns** — native HTML5 drag-and-drop in data table ✨ v1.1
+- [x] **Multi-series charts** — overlay multiple Y columns on Bar / Line charts ✨ v1.1
+- [x] **Local data insights** — heuristic one-line observations (peak, trend, correlation) ✨ v1.1
+- [ ] GitHub Actions CI (run tests on PR)
+- [ ] Larger file support (Web Worker for PapaParse)
+- [ ] Dark-mode chart screenshots
 
 ---
+Better libra
 
 ## 💬 Suggestions & Alternatives
 

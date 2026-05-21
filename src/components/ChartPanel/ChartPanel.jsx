@@ -1,15 +1,16 @@
 /**
- * ChartPanel component
- * --------------------
- * Renders a chart using Chart.js (via react-chartjs-2) based on the selected
- * chart type and axis configuration. Includes an export toolbar.
+ * ChartPanel component v1.1
+ * --------------------------
+ * Renders a Chart.js chart. Supports:
+ *  • Single-series Bar, Line, Scatter, Pie, Doughnut, Histogram
+ *  • Multi-series Bar and Line (multiple Y columns)
  *
  * Props:
- *   suggestion: Suggestion   — from chartSuggest.js
- *   rows:       object[]
- *   headers:    string[]
- *   types:      Record<string, string>
- *   customization: { color, xLabel, yLabel, showGrid, showLegend }
+ *   suggestion:    Suggestion   — from chartSuggest.js
+ *   rows:          object[]
+ *   headers:       string[]
+ *   types:         Record<string, string>
+ *   customization: { color, xLabel, yLabel, showGrid, showLegend, yKeys }
  */
 import { useRef, useMemo } from 'react';
 import {
@@ -55,11 +56,18 @@ function buildHistogram(values, bins = 15) {
 
 export default function ChartPanel({ suggestion, rows, headers, types, customization }) {
   const chartRef = useRef(null);
-  const { color = '#6366f1', xLabel, yLabel, showGrid = true, showLegend = true } = customization;
+  const {
+    color = '#6366f1',
+    xLabel, yLabel,
+    showGrid = true,
+    showLegend = true,
+    yKeys = [],          // multi-series
+  } = customization;
 
   const chartData = useMemo(() => {
     const { id, xKey, yKey } = suggestion;
 
+    // ── Histogram ──────────────────────────────────────────────────────────
     if (id === 'histogram') {
       const values = rows.map((r) => r[xKey]);
       const { labels, counts } = buildHistogram(values);
@@ -76,6 +84,7 @@ export default function ChartPanel({ suggestion, rows, headers, types, customiza
       };
     }
 
+    // ── Scatter ────────────────────────────────────────────────────────────
     if (id === 'scatter') {
       return {
         datasets: [{
@@ -90,8 +99,8 @@ export default function ChartPanel({ suggestion, rows, headers, types, customiza
       };
     }
 
+    // ── Pie / Doughnut ─────────────────────────────────────────────────────
     if (id === 'pie' || id === 'doughnut') {
-      // Aggregate: sum yKey per unique xKey value
       const agg = {};
       rows.forEach((r) => {
         const k = String(r[xKey] ?? 'N/A');
@@ -109,13 +118,37 @@ export default function ChartPanel({ suggestion, rows, headers, types, customiza
       };
     }
 
-    // Bar / Line
+    // ── Multi-series Bar / Line ────────────────────────────────────────────
+    const activeYKeys = yKeys.length > 0 ? yKeys : (yKey ? [yKey] : []);
     const labels = rows.map((r) => String(r[xKey] ?? '')).slice(0, 200);
-    const values = rows.map((r) => parseFloat(r[yKey])).slice(0, 200);
+
+    if (activeYKeys.length > 1) {
+      return {
+        labels,
+        datasets: activeYKeys.map((yk, i) => {
+          const c = PALETTE[i % PALETTE.length];
+          return {
+            label: yk,
+            data: rows.map((r) => parseFloat(r[yk])).slice(0, 200),
+            backgroundColor: id === 'bar' ? c + 'cc' : c + '22',
+            borderColor: c,
+            borderWidth: id === 'line' ? 2 : 1,
+            fill: false,
+            tension: 0.35,
+            borderRadius: id === 'bar' ? 4 : 0,
+            pointRadius: id === 'line' ? 2 : 0,
+            pointHoverRadius: 5,
+          };
+        }),
+      };
+    }
+
+    // ── Single-series Bar / Line ───────────────────────────────────────────
+    const values = rows.map((r) => parseFloat(r[activeYKeys[0]])).slice(0, 200);
     return {
       labels,
       datasets: [{
-        label: yKey,
+        label: activeYKeys[0] ?? yKey,
         data: values,
         backgroundColor: id === 'bar' ? color + 'cc' : color + '33',
         borderColor: color,
@@ -132,19 +165,20 @@ export default function ChartPanel({ suggestion, rows, headers, types, customiza
   const commonOptions = {
     responsive: true,
     maintainAspectRatio: true,
+    animation: { duration: 400 },
     plugins: {
-      legend: { display: showLegend },
+      legend: { display: showLegend, labels: { color: 'var(--text-secondary)', font: { size: 12 } } },
       tooltip: { mode: 'index', intersect: false },
     },
     scales: suggestion.id === 'pie' || suggestion.id === 'doughnut' ? {} : {
       x: {
         title: { display: !!xLabel, text: xLabel, color: '#94a3b8' },
-        grid: { display: showGrid, color: 'rgba(255,255,255,0.05)' },
+        grid: { display: showGrid, color: 'rgba(128,128,128,0.1)' },
         ticks: { color: '#94a3b8', maxRotation: 45 },
       },
       y: {
         title: { display: !!yLabel, text: yLabel, color: '#94a3b8' },
-        grid: { display: showGrid, color: 'rgba(255,255,255,0.05)' },
+        grid: { display: showGrid, color: 'rgba(128,128,128,0.1)' },
         ticks: { color: '#94a3b8' },
       },
     },

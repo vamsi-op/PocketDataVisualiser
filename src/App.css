@@ -297,6 +297,59 @@ details[open] .data-preview-summary::before {
   .app-header { padding: 2.5rem 1rem 2rem; }
 }
 
+/* ── Theme toggle ───────────────────────────────────────────────────────────── */
+.theme-toggle {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.1rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  z-index: 2;
+}
+
+.theme-toggle:hover {
+  background: var(--surface-hover);
+  border-color: var(--accent);
+  transform: rotate(15deg) scale(1.1);
+}
+
+/* ── Share toast ─────────────────────────────────────────────────────────────── */
+.share-toast {
+  text-align: center;
+  padding: 0.6rem 1.25rem;
+  background: rgba(99, 102, 241, 0.12);
+  border: 1px solid rgba(99, 102, 241, 0.3);
+  border-radius: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--accent-light);
+  animation: fade-in-out 0.3s ease;
+}
+
+@keyframes fade-in-out {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Insight banner ──────────────────────────────────────────────────────────── */
+.insight-banner {
+  padding: 0.7rem 1rem;
+  background: linear-gradient(135deg, rgba(99,102,241,0.08) 0%, rgba(16,185,129,0.06) 100%);
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 0.6rem;
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+
 /* ── Footer ─────────────────────────────────────────────────────────────────── */
 .app-footer {
   text-align: center;

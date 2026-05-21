@@ -1,12 +1,13 @@
 /**
- * CustomizationPanel component
- * ----------------------------
- * Sidebar/modal with controls to customize chart appearance.
+ * CustomizationPanel component v1.1
+ * -----------------------------------
+ * Sidebar with controls to customize chart appearance.
  *
  * Props:
  *   suggestion:       current Suggestion
  *   headers:          string[]
- *   customization:    { color, xLabel, yLabel, showGrid, showLegend }
+ *   types:            Record<string, string>
+ *   customization:    { color, xLabel, yLabel, showGrid, showLegend, yKeys }
  *   onChange(updates) — partial update callback
  *   onAxisChange({ xKey, yKey }) — update axis columns
  */
@@ -20,12 +21,27 @@ const PRESET_COLORS = [
 export default function CustomizationPanel({
   suggestion,
   headers,
+  types,
   customization,
   onChange,
   onAxisChange,
 }) {
-  const { color, xLabel, yLabel, showGrid, showLegend } = customization;
-  const isPolar = suggestion.id === 'pie' || suggestion.id === 'doughnut';
+  const { color, xLabel, yLabel, showGrid, showLegend, yKeys = [] } = customization;
+  const isPolar     = suggestion.id === 'pie' || suggestion.id === 'doughnut';
+  const isMultiAble = suggestion.id === 'bar' || suggestion.id === 'line';
+
+  // Numeric columns available for multi-series Y
+  const numericHeaders = headers.filter((h) => types?.[h] === 'numeric');
+
+  function toggleYKey(key) {
+    const next = yKeys.includes(key)
+      ? yKeys.filter((k) => k !== key)
+      : [...yKeys, key];
+    // Always keep at least one
+    if (next.length === 0) return;
+    onChange({ yKeys: next, yLabel: next[0] });
+    onAxisChange({ xKey: suggestion.xKey, yKey: next[0] });
+  }
 
   return (
     <aside className="customization-panel" aria-label="Chart customization options">
@@ -85,7 +101,29 @@ export default function CustomizationPanel({
         </>
       )}
 
-      {/* ── Labels ── */}
+      {/* ── Multi-series Y selector ── */}
+      {isMultiAble && numericHeaders.length > 1 && (
+        <div className="cp-group">
+          <label className="cp-label">Multi-Series Y Columns</label>
+          <p className="cp-hint">Check multiple to overlay on one chart</p>
+          <div className="multi-series-list">
+            {numericHeaders.map((h) => (
+              <label key={h} className="toggle-row">
+                <input
+                  type="checkbox"
+                  checked={yKeys.includes(h)}
+                  onChange={() => toggleYKey(h)}
+                  id={`yk-${h}`}
+                  aria-label={`Include ${h} in chart`}
+                />
+                <span>{h}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Axis Labels ── */}
       {!isPolar && (
         <>
           <div className="cp-group">

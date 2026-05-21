@@ -1,18 +1,28 @@
 /**
- * App.jsx — Pocket Data Visualizer
- * Main application component managing state and layout.
+ * App.jsx — Pocket Data Visualizer v1.1.0
+ * ─────────────────────────────────────────
+ * New in v1.1:
+ *  • Dark / Light mode toggle (useTheme hook)
+ *  • Shareable chart URLs (URL hash encoding)
+ *  • Drag-to-reorder columns in the data table
+ *  • Multi-series chart support (select multiple Y columns)
+ *  • Local heuristic data insights (no API needed)
+ *  • PWA offline support (via vite-plugin-pwa)
  */
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import FileUpload from './components/FileUpload/FileUpload';
 import DataTable from './components/DataTable/DataTable';
 import ChartPanel from './components/ChartPanel/ChartPanel';
 import CustomizationPanel from './components/CustomizationPanel/CustomizationPanel';
 import { parseFile, parseString } from './utils/csvParser';
-import { suggestCharts, getAxisLabels } from './utils/chartSuggest';
+import { suggestCharts } from './utils/chartSuggest';
 import { exportDataAsCsv } from './utils/exportChart';
+import { useTheme } from './hooks/useTheme';
+import { encodeStateToHash, decodeStateFromHash, buildShareUrl, clearHash } from './utils/urlHash';
+import { generateInsight } from './utils/dataInsights';
 import './App.css';
 
-// ── Sample dataset used for the demo ──────────────────────────────────────────
+// ── Sample dataset ──────────────────────────────────────────────────────────
 const SAMPLE_CSV = `Month,Revenue,Expenses,Profit
 Jan,42000,28000,14000
 Feb,38000,25000,13000
@@ -33,50 +43,83 @@ const DEFAULT_CUSTOMIZATION = {
   yLabel:     '',
   showGrid:   true,
   showLegend: true,
+  yKeys:      [],   // multi-series Y columns
 };
 
 export default function App() {
-  const [parsed,         setParsed]         = useState(null);
-  const [suggestions,    setSuggestions]     = useState([]);
-  const [activeIdx,      setActiveIdx]       = useState(0);
-  const [customization,  setCustomization]   = useState(DEFAULT_CUSTOMIZATION);
-  const [activeSuggestion, setActiveSuggestion] = useState(null);
-  const [loading,        setLoading]         = useState(false);
-  const [fileName,       setFileName]        = useState('');
+  const { theme, toggle: toggleTheme } = useTheme();
 
-  // ── Process a parsed result ────────────────────────────────────────────────
-  function applyParsed(result, name) {
+  const [parsed,          setParsed]          = useState(null);
+  const [suggestions,     setSuggestions]      = useState([]);
+  const [activeIdx,       setActiveIdx]        = useState(0);
+  const [customization,   setCustomization]    = useState(DEFAULT_CUSTOMIZATION);
+  const [activeSuggestion,setActiveSuggestion] = useState(null);
+  const [loading,         setLoading]          = useState(false);
+  const [fileName,        setFileName]         = useState('');
+  const [rawCsv,          setRawCsv]           = useState('');
+  const [shareMsg,        setShareMsg]         = useState('');
+  const [insight,         setInsight]          = useState(null);
+
+  // ── Restore from URL hash on mount ─────────────────────────────────────────
+  useEffect(() => {
+    const state = decodeStateFromHash();
+    if (state?.csvString) {
+      const result = parseString(state.csvString);
+      applyParsed(result, state.fileName ?? 'shared.csv', state.csvString);
+      if (state.customization) setCustomization((p) => ({ ...p, ...state.customization }));
+      if (typeof state.chartIdx === 'number') {
+        const sugs = suggestCharts(result.headers, result.types);
+        setActiveIdx(state.chartIdx);
+        setActiveSuggestion(sugs[state.chartIdx] ?? sugs[0] ?? null);
+      }
+      clearHash();
+    }
+  }, []);
+
+  // ── Compute insight whenever active suggestion changes ──────────────────────
+  useEffect(() => {
+    if (!parsed || !activeSuggestion) { setInsight(null); return; }
+    setInsight(generateInsight(parsed.headers, parsed.rows, parsed.types, activeSuggestion));
+  }, [parsed, activeSuggestion]);
+
+  // ── Process a parsed result ─────────────────────────────────────────────────
+  function applyParsed(result, name, csv = '') {
     const sugs = suggestCharts(result.headers, result.types);
     setParsed(result);
     setSuggestions(sugs);
     setActiveIdx(0);
     setActiveSuggestion(sugs[0] ?? null);
+    setRawCsv(csv);
+    setFileName(name);
+    const firstSug = sugs[0];
     setCustomization({
       ...DEFAULT_CUSTOMIZATION,
-      xLabel: sugs[0]?.xKey ?? '',
-      yLabel: sugs[0]?.yKey ?? '',
+      xLabel: firstSug?.xKey ?? '',
+      yLabel: firstSug?.yKey ?? '',
+      yKeys:  firstSug?.yKey ? [firstSug.yKey] : [],
     });
-    setFileName(name);
   }
 
-  // ── File upload handler ────────────────────────────────────────────────────
+  // ── File upload ─────────────────────────────────────────────────────────────
   const handleFile = useCallback(async (file) => {
     setLoading(true);
     try {
+      // Read raw text for URL hash sharing
+      const text = await file.text();
       const result = await parseFile(file);
-      applyParsed(result, file.name);
+      applyParsed(result, file.name, text);
     } finally {
       setLoading(false);
     }
   }, []);
 
-  // ── Load demo sample ──────────────────────────────────────────────────────
+  // ── Load sample ─────────────────────────────────────────────────────────────
   function loadSample() {
     const result = parseString(SAMPLE_CSV);
-    applyParsed(result, 'sample-revenue.csv');
+    applyParsed(result, 'sample-revenue.csv', SAMPLE_CSV);
   }
 
-  // ── Switch active chart suggestion ────────────────────────────────────────
+  // ── Switch chart suggestion tab ──────────────────────────────────────────────
   function selectSuggestion(idx) {
     setActiveIdx(idx);
     const sug = suggestions[idx];
@@ -85,21 +128,60 @@ export default function App() {
       ...prev,
       xLabel: sug.xKey ?? '',
       yLabel: sug.yKey  ?? '',
+      yKeys:  sug.yKey ? [sug.yKey] : [],
     }));
   }
 
-  // ── Axis column override ──────────────────────────────────────────────────
+  // ── Axis column override ─────────────────────────────────────────────────────
   function handleAxisChange({ xKey, yKey }) {
     setActiveSuggestion((prev) => ({ ...prev, xKey, yKey }));
-    setCustomization((prev) => ({ ...prev, xLabel: xKey, yLabel: yKey ?? '' }));
+    setCustomization((prev) => ({
+      ...prev,
+      xLabel: xKey,
+      yLabel: yKey ?? '',
+      yKeys:  yKey ? [yKey] : prev.yKeys,
+    }));
   }
 
-  // ── Reset ─────────────────────────────────────────────────────────────────
+  // ── Column reorder (drag) ────────────────────────────────────────────────────
+  function handleColumnReorder(newHeaders) {
+    setParsed((prev) => ({ ...prev, headers: newHeaders }));
+  }
+
+  // ── Share via URL hash ───────────────────────────────────────────────────────
+  function handleShare() {
+    if (!rawCsv) return;
+    const url = buildShareUrl({
+      csvString:    rawCsv,
+      fileName,
+      chartIdx:     activeIdx,
+      customization,
+    });
+    if (!url) {
+      setShareMsg('⚠ Dataset too large to encode in a URL (> 80 KB).');
+      setTimeout(() => setShareMsg(''), 3000);
+      return;
+    }
+    navigator.clipboard.writeText(url).then(() => {
+      setShareMsg('✅ Link copied to clipboard!');
+      setTimeout(() => setShareMsg(''), 3000);
+    }).catch(() => {
+      // Fallback: push to hash so the user can copy the URL bar
+      encodeStateToHash({ csvString: rawCsv, fileName, chartIdx: activeIdx, customization });
+      setShareMsg('🔗 URL updated — copy from the address bar');
+      setTimeout(() => setShareMsg(''), 4000);
+    });
+  }
+
+  // ── Reset ────────────────────────────────────────────────────────────────────
   function reset() {
     setParsed(null);
     setSuggestions([]);
     setActiveSuggestion(null);
     setFileName('');
+    setRawCsv('');
+    setInsight(null);
+    clearHash();
   }
 
   return (
@@ -118,6 +200,18 @@ export default function App() {
             <span className="badge-pill">No Account Needed</span>
           </div>
         </div>
+
+        {/* Theme toggle */}
+        <button
+          id="theme-toggle-btn"
+          className="theme-toggle"
+          onClick={toggleTheme}
+          aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+          title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}
+        >
+          {theme === 'dark' ? '☀️' : '🌙'}
+        </button>
+
         <div className="header-glow" aria-hidden="true" />
       </header>
 
@@ -147,6 +241,15 @@ export default function App() {
               <span className="file-info-name">📄 {fileName}</span>
               <div className="file-info-actions">
                 <button
+                  id="share-btn"
+                  className="btn btn-sm btn-ghost"
+                  onClick={handleShare}
+                  aria-label="Share chart via URL"
+                  title="Copy shareable link"
+                >
+                  🔗 Share
+                </button>
+                <button
                   id="export-csv-btn"
                   className="btn btn-sm btn-ghost"
                   onClick={() => exportDataAsCsv(parsed.headers, parsed.rows, fileName.replace(/\.[^.]+$/, ''))}
@@ -165,6 +268,13 @@ export default function App() {
               </div>
             </div>
 
+            {/* Share feedback */}
+            {shareMsg && (
+              <div className="share-toast" role="status" aria-live="polite">
+                {shareMsg}
+              </div>
+            )}
+
             {/* ── Data preview ── */}
             <details className="data-preview-details" open>
               <summary className="data-preview-summary">Data Preview</summary>
@@ -173,6 +283,7 @@ export default function App() {
                 rows={parsed.rows}
                 types={parsed.types}
                 errors={parsed.errors}
+                onReorder={handleColumnReorder}
               />
             </details>
 
@@ -202,6 +313,13 @@ export default function App() {
                   ))}
                 </div>
 
+                {/* ── Insight banner ── */}
+                {insight && (
+                  <div className="insight-banner" role="note" aria-label="Data insight">
+                    {insight}
+                  </div>
+                )}
+
                 {/* ── Chart + customize layout ── */}
                 <div className="chart-customize-layout">
                   <div
@@ -224,6 +342,7 @@ export default function App() {
                   <CustomizationPanel
                     suggestion={activeSuggestion ?? suggestions[0]}
                     headers={parsed.headers}
+                    types={parsed.types}
                     customization={customization}
                     onChange={(updates) => setCustomization((prev) => ({ ...prev, ...updates }))}
                     onAxisChange={handleAxisChange}
