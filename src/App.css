@@ -37,6 +37,10 @@
   pointer-events: none;
 }
 
+[data-theme='light'] .header-glow {
+  background: radial-gradient(ellipse at center, rgba(99, 102, 241, 0.10) 0%, transparent 65%);
+}
+
 .logo {
   display: flex;
   align-items: center;
@@ -58,7 +62,16 @@
   font-size: 2rem;
   font-weight: 800;
   letter-spacing: -0.04em;
+  /* Dark mode: light-to-indigo gradient */
   background: linear-gradient(135deg, #f1f5f9 0%, #818cf8 60%, #6366f1 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Light mode: dark navy → indigo so title is always visible */
+[data-theme='light'] .logo-text {
+  background: linear-gradient(135deg, #1e1b4b 0%, #4338ca 50%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
