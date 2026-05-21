@@ -37,10 +37,11 @@ export default function CustomizationPanel({
     const next = yKeys.includes(key)
       ? yKeys.filter((k) => k !== key)
       : [...yKeys, key];
-    // Always keep at least one
+    // Always keep at least one selected
     if (next.length === 0) return;
+    // Only update yKeys — do NOT call onAxisChange here, as it would
+    // reset yKeys to a single-item array inside handleAxisChange.
     onChange({ yKeys: next, yLabel: next[0] });
-    onAxisChange({ xKey: suggestion.xKey, yKey: next[0] });
   }
 
   return (
