@@ -231,6 +231,52 @@ details[open] .data-preview-summary::before {
   gap: 0.25rem;
 }
 
+.section-title-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+/* ── Renderer toggle ────────────────────────────────────────────────────────── */
+.renderer-toggle {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--border);
+  border-radius: 0.5rem;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.renderer-btn {
+  padding: 0.3rem 0.85rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-family: var(--font-sans);
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+
+.renderer-btn:hover:not(.renderer-btn--active) {
+  background: var(--surface-hover);
+  color: var(--text-primary);
+}
+
+.renderer-btn--active {
+  background: var(--accent);
+  color: #fff;
+  cursor: default;
+}
+
+.renderer-toggle .renderer-btn:not(:last-child) {
+  border-right: 1px solid var(--border);
+}
+
 .section-title {
   font-size: 1.35rem;
   font-weight: 700;

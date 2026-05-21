@@ -44,6 +44,24 @@ export default defineConfig({
     }),
   ],
 
+  // ── Build / code-splitting ────────────────────────────────────────────────
+  build: {
+    chunkSizeWarningLimit: 800,
+    rolldownOptions: {
+      output: {
+        // Split ECharts (~1.1 MB) and Chart.js into separate lazy chunks
+        manualChunks(id) {
+          if (id.includes('node_modules/echarts') || id.includes('node_modules/zrender')) {
+            return 'echarts';
+          }
+          if (id.includes('node_modules/chart.js') || id.includes('node_modules/react-chartjs-2')) {
+            return 'chartjs';
+          }
+        },
+      },
+    },
+  },
+
   // ── Vitest configuration ──────────────────────────────────────────────────
   test: {
     environment: 'jsdom',

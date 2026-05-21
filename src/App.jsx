@@ -13,11 +13,13 @@ import { useState, useCallback, useEffect } from 'react';
 import FileUpload from './components/FileUpload/FileUpload';
 import DataTable from './components/DataTable/DataTable';
 import ChartPanel from './components/ChartPanel/ChartPanel';
+import EChartsPanel from './components/EChartsPanel/EChartsPanel';
 import CustomizationPanel from './components/CustomizationPanel/CustomizationPanel';
 import { parseFile, parseString } from './utils/csvParser';
 import { suggestCharts } from './utils/chartSuggest';
 import { exportDataAsCsv } from './utils/exportChart';
 import { useTheme } from './hooks/useTheme';
+import { useRenderer } from './hooks/useRenderer';
 import { encodeStateToHash, decodeStateFromHash, buildShareUrl, clearHash } from './utils/urlHash';
 import { generateInsight } from './utils/dataInsights';
 import './App.css';
@@ -48,6 +50,7 @@ const DEFAULT_CUSTOMIZATION = {
 
 export default function App() {
   const { theme, toggle: toggleTheme } = useTheme();
+  const { renderer, toggle: toggleRenderer } = useRenderer();
 
   const [parsed,          setParsed]          = useState(null);
   const [suggestions,     setSuggestions]      = useState([]);
@@ -291,7 +294,29 @@ export default function App() {
             {suggestions.length > 0 && (
               <section className="charts-section" aria-label="Chart suggestions">
                 <div className="section-header">
-                  <h2 className="section-title">Suggested Charts</h2>
+                  <div className="section-title-row">
+                    <h2 className="section-title">Suggested Charts</h2>
+                    <div className="renderer-toggle" role="group" aria-label="Chart renderer">
+                      <button
+                        id="renderer-chartjs"
+                        className={`renderer-btn ${renderer === 'chartjs' ? 'renderer-btn--active' : ''}`}
+                        onClick={() => renderer !== 'chartjs' && toggleRenderer()}
+                        aria-pressed={renderer === 'chartjs'}
+                        title="Chart.js renderer"
+                      >
+                        📊 Chart.js
+                      </button>
+                      <button
+                        id="renderer-echarts"
+                        className={`renderer-btn ${renderer === 'echarts' ? 'renderer-btn--active' : ''}`}
+                        onClick={() => renderer !== 'echarts' && toggleRenderer()}
+                        aria-pressed={renderer === 'echarts'}
+                        title="Apache ECharts — GPU-accelerated, 20+ chart types"
+                      >
+                        ⚡ ECharts
+                      </button>
+                    </div>
+                  </div>
                   <p className="section-subtitle">
                     Based on your data's column types, here are the best visualizations:
                   </p>
@@ -328,8 +353,17 @@ export default function App() {
                     aria-labelledby={`tab-${activeSuggestion?.id}-${activeIdx}`}
                     className="chart-panel-area"
                   >
-                    {activeSuggestion && (
+                    {activeSuggestion && renderer === 'chartjs' && (
                       <ChartPanel
+                        suggestion={activeSuggestion}
+                        rows={parsed.rows}
+                        headers={parsed.headers}
+                        types={parsed.types}
+                        customization={customization}
+                      />
+                    )}
+                    {activeSuggestion && renderer === 'echarts' && (
+                      <EChartsPanel
                         suggestion={activeSuggestion}
                         rows={parsed.rows}
                         headers={parsed.headers}

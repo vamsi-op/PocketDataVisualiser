@@ -1,0 +1,48 @@
+/* EChartsPanel.css */
+
+.echarts-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.echarts-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.85rem 1.25rem 0;
+}
+
+.echarts-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.echarts-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.echarts-badge {
+  font-size: 0.72rem;
+  font-weight: 700;
+  padding: 0.15rem 0.55rem;
+  border-radius: 99px;
+  background: rgba(245, 158, 11, 0.12);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: #fbbf24;
+  letter-spacing: 0.03em;
+}
+
+.echarts-reason {
+  padding: 0.35rem 1.25rem 0;
+  font-size: 0.82rem;
+  color: var(--text-muted);
+}
+
+.echarts-canvas-wrapper {
+  padding: 0.5rem 0.75rem 0.75rem;
+}
